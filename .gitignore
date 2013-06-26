@@ -1,0 +1,17 @@
+# Secret info #
+###############
+password.txt
+
+# Compiled source #
+###################
+*.pyc
+
+# OS files #
+############
+.DS_Store
+.DS_Store?
+._*
+.Trashes
+Icon?
+Thumbs.db
+

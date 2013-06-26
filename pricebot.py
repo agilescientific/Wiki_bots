@@ -1,5 +1,3 @@
-#!/usr/bin/python
-# 
 # Pricebot
 # Matt Hall, 2013
 # Apache license v2.0
@@ -19,6 +17,11 @@ import mwclient
 import urllib2
 import time
 
+# Put the bot's password on the wiki in a file called password.py
+# containing one line:
+#    password = "<the password>"
+import password
+
 # Set globals
 BASE_URL = "http://query.yahooapis.com/v1/public/yql"
 FORMATS = "&format=xml&diagnostics=false&env=http%3A%2F%2Fdatatables.org%2Falltables.env"
@@ -28,7 +31,7 @@ STATUS_PAGE  = 'User:Pricebot/Status'
 
 # You will need to create a user for Pricebot in your wiki
 USERNAME = 'Pricebot'
-PASSWORD = '' # Put the password here
+PASSWORD = password.password
 
 # You will need to change these too
 WIKI_URL = 'subsurfwiki.org'
@@ -38,6 +41,7 @@ def bot_status(site):
     # Check the bot's status page
     for word in STOP_WORDS:
         if word in site.Pages[STATUS_PAGE].edit().lower():
+            print "Bot stopped by Status page"
             return 0
     return 1
 	
@@ -138,7 +142,7 @@ def set_crude_prices(site):
         else:
             # Timed out
             print benchmark, "failed"
-            return None
+            pass
 
     return None
 

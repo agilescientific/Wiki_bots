@@ -40,7 +40,7 @@ WIKI_PATH = '/mediawiki/' # The script path for your wiki
 def bot_status(site):
     # Check the bot's status page
     for word in STOP_WORDS:
-        if word in site.Pages[STATUS_PAGE].edit().lower():
+        if word in site.Pages[STATUS_PAGE].edit().lower().split('----')[1]:
             print "Bot stopped by Status page"
             return 0
     return 1
@@ -131,7 +131,12 @@ def set_crude_prices(site):
                 CL = float(price)
 
             if benchmark == "WCC":
-                price = str(CL + float(price))
+                if CL == 0:
+                    # then CL failed and WCC must fail too
+                    print "WCC cannot be computed because CL failed"
+                    pass
+                else:
+                    price = str(CL + float(price))
 
             # Save the result back to the relevant subpage
             page = site.Pages['Crude_price/'+benchmark ]

@@ -82,7 +82,7 @@ def set_exchange_rates(site):
         else:
             # Timed out
             print currency, "failed"
-            pass
+            continue
 
     return None
 
@@ -134,7 +134,7 @@ def set_crude_prices(site):
                 if CL == 0:
                     # then CL failed and WCC must fail too
                     print "WCC cannot be computed because CL failed"
-                    pass
+                    continue
                 else:
                     price = str(CL + float(price))
 
@@ -147,7 +147,7 @@ def set_crude_prices(site):
         else:
             # Timed out
             print benchmark, "failed"
-            pass
+            continue
 
     return None
 

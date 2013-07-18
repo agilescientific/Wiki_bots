@@ -40,7 +40,7 @@ WIKI_PATH = '/mediawiki/' # The script path for your wiki
 def bot_status(site):
     # Check the bot's status page
     for word in STOP_WORDS:
-        if word in site.Pages[STATUS_PAGE].edit().lower().split('----')[1]:
+        if word in site.Pages[STATUS_PAGE].edit().lower():
             print "Bot stopped by Status page"
             return 0
     return 1

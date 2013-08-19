@@ -19,8 +19,8 @@ import time
 
 # Put the bot's password on the wiki in a file called password.py
 # containing one line:
-#    password = "<the password>"
-import password
+#    username = "<password>"
+import passwords
 
 # Set globals
 BASE_URL = "http://query.yahooapis.com/v1/public/yql"
@@ -31,7 +31,7 @@ STATUS_PAGE  = 'User:Pricebot/Status'
 
 # You will need to create a user for Pricebot in your wiki
 USERNAME = 'Pricebot'
-PASSWORD = password.password
+PASSWORD = passwords.pricebot
 
 # You will need to change these too
 WIKI_URL = 'subsurfwiki.org'

@@ -17,10 +17,20 @@ import mwclient
 import urllib2
 import time
 
-# Put the bot's password on the wiki in a file called password.py
-# containing one line:
-#    username = "<password>"
-import passwords
+from config import config
+
+# You will need to create a bot user in your wiki
+# Create a file 'setup.py'
+# config = {'wiki_url':'subsurfwiki.org',
+#           'wiki_path':'/mediawiki/',
+#           'exbot':'<password>',
+#           'otherbot':'<password>'}
+
+BOT_NAME = 'exbot'
+PASSWORD = config[BOT_NAME]
+
+WIKI_URL = config['wiki_url']
+WIKI_PATH = config['wiki_path'] # The script path for your wiki
 
 # Set globals
 BASE_URL = "http://query.yahooapis.com/v1/public/yql"
@@ -154,7 +164,7 @@ def set_crude_prices(site):
 # Now do the work!
 # First, pass credentials
 wiki = mwclient.Site(WIKI_URL, path=WIKI_PATH)
-wiki.login(USERNAME, PASSWORD)
+wiki.login(BOT_NAME, PASSWORD)
 
 # Then check if the bot is disabled, and act accordingly
 if bot_status(wiki) == 1:

@@ -4,21 +4,23 @@
 import mwclient
 import re
 
-# Put the bot's password in a file called passwords.py
-# containing one line per bot:
-#    username = "<password>"
-import passwords
+from config import config
 
-# You will need to create a user for Pricebot in your wiki
-USERNAME = 'Exbot'
-PASSWORD = passwords.exbot
+# You will need to create a bot user in your wiki
+# Create a file 'setup.py', e.g.
+# config = {'wiki_url':'subsurfwiki.org',
+#           'wiki_path':'/mediawiki/',
+#           'exbot':'<password>',
+#           'otherbot':'<password>'}
 
-# You will need to change these too
-WIKI_URL = 'subsurfwiki.org'
-WIKI_PATH = '/mediawiki/' # The script path for your wiki
+BOT_NAME = 'exbot'
+PASSWORD = config[BOT_NAME]
+
+WIKI_URL = config['wiki_url']
+WIKI_PATH = config['wiki_path'] # The script path for your wiki
 
 wiki = mwclient.Site(WIKI_URL, path=WIKI_PATH)
-wiki.login(USERNAME, PASSWORD)
+wiki.login(BOT_NAME, PASSWORD)
 
 for page in wiki.Categories['Petrophysics']:
     

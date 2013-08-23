@@ -1,10 +1,16 @@
 # Secret info #
 ###############
 password*.py
+config.py
 
 # Compiled source #
 ###################
 *.pyc
+
+# Output files #
+################
+*.out
+*.dl
 
 # OS files #
 ############

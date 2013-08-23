@@ -13,7 +13,7 @@ from config import config
 #           'exbot':'<password>',
 #           'otherbot':'<password>'}
 
-BOT_NAME = 'pricebot'
+BOT_NAME = 'exbot'
 PASSWORD = config[BOT_NAME]
 
 WIKI_URL = config['wiki_url']

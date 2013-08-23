@@ -2,8 +2,6 @@
 # Linknet
 
 import mwclient
-import re
-
 from config import config
 
 # You will need to create a bot user in your wiki

@@ -3,6 +3,9 @@
 password*.py
 config.py
 
+# proprietary stuff
+cop*
+
 # Compiled source #
 ###################
 *.pyc

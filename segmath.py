@@ -32,6 +32,13 @@ WIKI_PATH = '/'
 
 site = mwclient.Site(WIKI_URL, path=WIKI_PATH)
 
+# make and fill a dict for the cookies
+c = {}
+for cookie in cj:
+    c[cookie.name] = cookie.value
+
+site.login(username=USER,password=PASS,cookies=c)
+
 ##### GET ON WITH IT #####
 # Use site.allpages, defaults to main namespace
 # 500 is the Dictionary namespace

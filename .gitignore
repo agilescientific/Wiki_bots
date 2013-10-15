@@ -3,8 +3,13 @@
 password*.py
 config.py
 
-# proprietary stuff
+# proprietary stuff #
+#####################
 cop*
+
+# Notebooks #
+#############
+*.ipynb
 
 # Compiled source #
 ###################

@@ -1,1 +1,1 @@
-from patrol.patrolapp import main; main()
+from patrol.main import main; main()

@@ -15,6 +15,7 @@ from paste.cascade import Cascade
 from paste import httpserver
 
 from webapp2 import RequestHandler, WSGIApplication
+import webapp2_static
 import mimetypes
 import jinja2
 import os
@@ -46,7 +47,8 @@ class Handler(RequestHandler):
 
 class StaticHandler(Handler):
     def get(self, path):
-        abs_path = os.path.abspath(os.path.join(self.app.config.get('webapp2_static.static_file_path', 'static'), path))
+        abs_path = os.path.abspath(os.path.join(os.path.dirname(__file__),'static', path))
+        print abs_path
         if os.path.isdir(abs_path) or abs_path.find(os.getcwd()) != 0:
             self.response.set_status(403)
             return
@@ -54,6 +56,7 @@ class StaticHandler(Handler):
             f = open(abs_path, 'r')
             #self.response.headers.add_header('Content-Type', mimetypes.guess_type(abs_path)[0])
             self.response.content_type = 'text/css'
+            #self.response.content_type = mimetypes.guess_type(abs_path)[0]
             self.response.out.write(f.read())
             f.close()
         except:
@@ -72,9 +75,13 @@ class MainHandler(Handler):
 # The webapp itself...
 web_app = WSGIApplication([
     ('/', MainHandler),
-    (r'/static/(.+)', StaticHandler)
+    (r'/patrol/static/(.+)', StaticHandler)
     # Put other handlers here, if you need them
 ], debug = True)
+# web_app = WSGIApplication([
+#     ('/', MainHandler),
+#     (r'/static/(.+)', webapp2_static.StaticFileHandler)
+# ])
 
 # Create an app to serve static files
 #static_app = StaticURLParser('static')

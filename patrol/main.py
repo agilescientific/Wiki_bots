@@ -9,14 +9,22 @@
 
 ############################
 # Import libraries
-#from paste.fileapp import DirectoryApp
-from paste.urlparser import StaticURLParser
-from paste.cascade import Cascade
-from paste import httpserver
 
+# One approach to static files: DirectoryApp
+#from paste.fileapp import DirectoryApp
+
+# Another approach: Cascade
+#from paste.urlparser import StaticURLParser
+#from paste.cascade import Cascade
+
+# Yet another approach
+#from webapp2_static import StaticFileHandler
+
+# Main handlers and server
 from webapp2 import RequestHandler, WSGIApplication
-import webapp2_static
+from paste import httpserver
 import mimetypes
+
 import jinja2
 import os
 
@@ -54,9 +62,7 @@ class StaticHandler(Handler):
             return
         try:
             f = open(abs_path, 'r')
-            #self.response.headers.add_header('Content-Type', mimetypes.guess_type(abs_path)[0])
-            self.response.content_type = 'text/css'
-            #self.response.content_type = mimetypes.guess_type(abs_path)[0]
+            self.response.content_type = mimetypes.guess_type(abs_path)[0]
             self.response.out.write(f.read())
             f.close()
         except:
@@ -73,24 +79,13 @@ class MainHandler(Handler):
         self.render("patrol.html", result=worst)
 
 # The webapp itself...
-web_app = WSGIApplication([
+app = WSGIApplication([
     ('/', MainHandler),
     (r'/patrol/static/(.+)', StaticHandler)
-    # Put other handlers here, if you need them
 ], debug = True)
-# web_app = WSGIApplication([
-#     ('/', MainHandler),
-#     (r'/static/(.+)', webapp2_static.StaticFileHandler)
-# ])
-
-# Create an app to serve static files
-#static_app = StaticURLParser('static')
-
-# Create a cascade that looks for static files first, then tries the webapp
-#app = Cascade([static_app, web_app])
 
 def main():
-    httpserver.serve(web_app, host='127.0.0.1', port='8080')
+    httpserver.serve(app, host='127.0.0.1', port='8080')
 
 if __name__ == '__main__':
     main()

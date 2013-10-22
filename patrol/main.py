@@ -27,6 +27,8 @@ import mimetypes
 
 import jinja2
 import os
+import re
+from urlparse import urlparse
 
 # Import the file with the wiki client and processor in it
 import patrol
@@ -56,7 +58,6 @@ class Handler(RequestHandler):
 class StaticHandler(Handler):
     def get(self, path):
         abs_path = os.path.abspath(os.path.join(os.path.dirname(__file__),'static', path))
-        print abs_path
         if os.path.isdir(abs_path) or abs_path.find(os.getcwd()) != 0:
             self.response.set_status(403)
             return
@@ -72,11 +73,28 @@ class StaticHandler(Handler):
 # This is where the handlers go
 class MainHandler(Handler):
     def get(self):
-        self.render("patrol.html")
+        self.render('patrol.html')
         
     def post(self):
-        worst = patrol.newpages()
-        self.render("patrol.html", result=worst)
+        url = self.request.get('url')
+        
+        if url:
+            o = urlparse(url)
+            domain = o.netloc
+            path = re.sub(r'api.php',r'',o.path)
+            print "AWESOME, the URL is {0}{1}".format(domain,path)
+        else:
+            domain, path = 'subsurfwiki.org','/mediawiki/'
+            print "SOMETHING WRONG, no URL"
+        
+        result = patrol.newpages(domain,path)
+        
+        worst = result[0]
+        bad = result[1]
+                
+        page_url = re.sub(r'api.php',r'index.php',url)
+        
+        self.render('patrol.html', worst=worst, bad=bad, url=url, page_url=page_url)
 
 # The webapp itself...
 app = WSGIApplication([

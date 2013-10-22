@@ -4,21 +4,23 @@ import mwclient
 import re
 
 # Authenticate
-import config
+#import config
 
-BOT_NAME = 'exbot'
-PASSWORD = config.config[BOT_NAME]
+#BOT_NAME = 'exbot'
+#PASSWORD = config.config[BOT_NAME]
 
-WIKI_URL = config.config['wiki_url']
-WIKI_PATH = config.config['wiki_path'] # The script path for your wiki
+#WIKI_URL = config.config['wiki_url']
+#WIKI_PATH = config.config['wiki_path'] # The script path for your wiki
 
-def newpages():
-    site = mwclient.Site(WIKI_URL, path=WIKI_PATH)
-    site.login(BOT_NAME, PASSWORD)
+def newpages(domain='subsurfwiki.org', path='/mediawiki/'):
+    
+    site = mwclient.Site(domain, path=path)
+    print 'connecting to {0}'.format(domain)
+    #site.login(BOT_NAME, PASSWORD)
     
     # Get the list of new pages' titles
     new_pages = [new_page['title'] for new_page in site.recentchanges() if new_page['type'] == u'new' and new_page['ns'] == 0]
-    
+        
     # Build a dict of pages with their scores on various axes
     results = {}
     for p in new_pages:
@@ -68,9 +70,9 @@ def newpages():
         else:
             bad[p] = results[p]
     
-    #possibly_titlecase = [r for r in results if results[r][6]>=2]
+    possibly_titlecase = [r for r in results if results[r][6]>=2]
 
     worst_new_pages = sorted(bad, key=lambda x : sum(bad[x]))
     
-    return worst_new_pages
+    return worst_new_pages, possibly_titlecase
     

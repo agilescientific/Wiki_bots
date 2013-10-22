@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+  <head>
     <meta charset="utf-8">
     <title>patrol</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -25,9 +25,9 @@
       });
     </script>
 
-</head>
+  </head>
 
-<body>
+  <body>
 
     <div class="navbar navbar-fixed-top">
       <div class="navbar-inner">
@@ -42,43 +42,72 @@
       </div>
     </div>
     
-    <div class="container">
-    <div class="hero-unit">
-      <form method="post">
-        <button type="submit" class="btn btn-primary">
+    <div class="container"> <!-- start container -->
+<!--
+      <div class="hero-unit">
+        <form method="post">
+          <button type="submit" class="btn btn-primary">
           Get pages
-        </button>
-      </form>
-    </div>
+          </button>
+        </form>
+      </div>
+-->
+      {% if not worst %}
+      <div class="hero-unit">
+        <form method="post" id="form-inline">
+          <fieldset>
+            <legend>Provide the URL for the wiki's api.php</legend>
+            <input name="url" type="text" placeholder="http://www.subsurfwiki.org/mediawiki/api.php" class="input-xxlarge">
+            <div>
+              <button type="submit" class="btn btn-primary">
+              Get pages
+              </button>
+            </div>
+          </fieldset>
+        </form>
+      </div>
+      {% endif %}
 
-    {% if result %}
-    <div class="hero-unit">
-    <h3>Worst page{% if result.__len__() > 1 %}s{% endif %}</h3>
-    <p>
-      {% for page in result %}
-          <li>{{ page }}</li>
-      {% endfor %}
-    </p>
-    </div>
-    {% endif %}
+      {% if worst %}
+        <div class="hero-unit">
+          <h3>Worst page{% if worst.__len__() > 1 %}s{% endif %}<br />
+              <small style="color:gray">{{ url }}</small></h3>
+          <p>
+            {% for page in worst %}
+              <li><a href="{{ page_url }}?title={{page|replace(" ","_")}}">{{ page }}</a></li>
+            {% endfor %}
+          </p>
+        </div>
+      {% endif %}
     
-    <footer>
+      {% if bad %}
+        <div class="hero-unit">
+          <h3>Page{% if bad.__len__() > 1 %}s{% endif %} with possibly bad title{% if bad.__len__() > 1 %}s{% endif %}</h3>
+          <p>
+            {% for page in bad %}
+              <li><a href="{{ page_url }}?title={{page|replace(" ","_")}}">{{ page }}</a></li>
+            {% endfor %}
+          </p>
+        </div>
+      {% endif %}
+    
+      <footer>
         <div style="float:right">
           <a href="http://webapp-improved.appspot.com/">
-          <img src="http://webapp-improved.appspot.com/_static/webapp2_blue_small.png" 
-               title="Powered by webapp2"
-               alt="Powered by webapp2"
-               width="100" /></a>
+            <img src="http://webapp-improved.appspot.com/_static/webapp2_blue_small.png" 
+                 title="Powered by webapp2"
+                 alt="Powered by webapp2"
+                 width="100" /></a>
         </div>
         <p><a href="http://www.agilegeoscience.com/">Agile Geoscience 2013</a></p>
       </footer>
   
-  </div> <!-- end container-->
+    </div> <!-- end container -->
 
     <!-- Le javascript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
     <script src="/patrol/static/js/bootstrap-dropdown.js"></script>
 
-</body>
+  </body>
 </html>

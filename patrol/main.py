@@ -91,10 +91,12 @@ class MainHandler(Handler):
         
         worst = result[0]
         bad = result[1]
-                
+        
+        everything = result[2]
+                        
         page_url = re.sub(r'api.php',r'index.php',url)
         
-        self.render('patrol.html', worst=worst, bad=bad, url=url, page_url=page_url)
+        self.render('patrol.html', worst=worst, bad=bad, url=url, page_url=page_url, results=everything)
 
 # The webapp itself...
 app = WSGIApplication([

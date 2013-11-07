@@ -58,10 +58,20 @@ def newpages(domain='subsurfwiki.org', path='/mediawiki/'):
     
     # Parse the results and generate lists of pages needing attention
     good, bad = {}, {}
+    new_pages = {}
+    
     best_score = 0
     
     for p in results:
         score = sum(results[p])
+        
+        new_pages[p] = [score]
+        
+        if results[p][6] >= 2:
+            new_pages[p].append(True)
+        else:
+            new_pages[p].append(False)
+        
         if score >= 10:
             good[p] = results[p]
             if score > best_score:
@@ -70,9 +80,11 @@ def newpages(domain='subsurfwiki.org', path='/mediawiki/'):
         else:
             bad[p] = results[p]
     
-    possibly_titlecase = [r for r in results if results[r][6]>=2]
+    # Generate list of pages flagged as possibly named with title case 
+    possibly_titlecase = [p for p in results if results[p][6]>=2]
 
-    worst_new_pages = sorted(bad, key=lambda x : sum(bad[x]))
+    # Generate ordered list of worst pages, scoring under 10
+    worst_new_pages = sorted(bad, key=lambda p : sum(bad[p]))
     
-    return worst_new_pages, possibly_titlecase
+    return worst_new_pages, possibly_titlecase, new_pages
     

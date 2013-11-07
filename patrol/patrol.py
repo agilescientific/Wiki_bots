@@ -13,7 +13,7 @@ import time
 #WIKI_URL = config.config['wiki_url']
 #WIKI_PATH = config.config['wiki_path'] # The script path for your wiki
 
-def newpages(domain, path, threshold=10, days=14):
+def newpages(domain, path, categories=None, threshold=10, days=14):
     
     site = mwclient.Site(domain, path=path)
     print 'connecting to {0}'.format(domain)
@@ -21,7 +21,9 @@ def newpages(domain, path, threshold=10, days=14):
     
     # Get the list of new pages' titles
     new_pages = [new_page['title'] for new_page in site.recentchanges() if new_page['type'] == u'new' and new_page['ns'] == 0  and (time.gmtime()[7] - new_page['timestamp'][7]) < days]
-        
+    
+    
+    
     # Build a dict of pages with their scores on various axes
     results = {}
     for p in new_pages:

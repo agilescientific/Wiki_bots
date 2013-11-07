@@ -30,6 +30,8 @@
     
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
     <script src="/patrol/static/js/bootstrap.js"></script>
+    <script src="/patrol/static/js/button.js"></script>
+
     <script>  
       $(document).ready(function() {
       $('.dropdown-toggle').dropdown();
@@ -74,6 +76,13 @@
           </div>
           
           <div class="form-group">
+            <label for="categories" class="col-sm-2 control-label">Categories</label>
+            <div class="col-sm-10">
+              <textarea name="categories" rows="3" placeholder="All pages... or enter one category per line" class="form-control"></textarea>
+            </div>
+          </div>
+          
+          <div class="form-group">
             <label for="threshold" class="col-sm-2 control-label">Threshold of good</label>
             <div class="col-sm-10">
               <input name="threshold" type="text" placeholder="10" class="form-control">
@@ -87,17 +96,25 @@
             </div>
           </div>
           
-          <div>
-            <button type="submit" class="btn btn-primary">
+          <div class="btn-group">
+            <button type="submit" id="getpages" class="btn btn-primary" data-loading-text="Finding pages...">
               Get pages
+              <script>
+                $(':input[data-loading-text]').click(function () {
+                  var btn = $(this)
+                  btn.button('loading')
+                })
+              </script>
             </button>
+    
+
           </div>
           
         </form>
         
         </div>
         
-        <div class="panel-footer">Please be patient while the query runs</div>
+        <div class="panel-footer" style="color:lightgray;">Queries can take up to a minute or more, depending on your settings.</div>
 
       </div>
 
@@ -111,18 +128,21 @@
           <table width="100%">
             {% for page in worst %}
               <tr>
-                <td style="width:20%">
+                <td style="width:15%">
                   <div class="chart" style="padding:0 1em 0 0;">
                     <div style="width: {{ 100 - results[page][0] * ( 100 / threshold ) }}px;">{{ 10 - results[page][0] * ( 10 / threshold ) | int }}</div>
                   </div>
                 </td>
-<!--
-                <td  width="10%">
-                  {{results[page][0]}}
+
+                <td  width="20%">
+                <form display="inline">
+                  <button type="button" class="btn btn-success" onclick="location.href='{{ page_url }}?title={{ page | replace(' ','_') }}&action=edit'">Edit</button>
+                  <button type="button" class="btn btn-info" onclick="location.href='{{ page_url }}?title={{ page | replace(' ','_') }}&action=history'">History</button>
+                </form>
                 </td>
--->
+
                 <td>
-                  <a href="{{ page_url }}?title={{ page|replace(" ","_") }}">{{ page }}</a>
+                  <a href="{{ page_url }}?title={{ page | replace(' ','_') }}">{{ page }}</a>
                 </td>
               </tr>
             {% endfor %}

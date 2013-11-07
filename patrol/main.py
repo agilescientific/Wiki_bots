@@ -77,7 +77,17 @@ class MainHandler(Handler):
         
     def post(self):
         url = self.request.get('url')
+        categories = self.request.get('categories')        
+        categories = re.sub(r"[,\.\n]+", r"\n", categories)
         
+        cats = [i.strip() for i in categories.split('\n')]
+        cats = filter(None,cats)
+        
+        if cats:
+            print "working on categories", cats
+        else:
+            print "working on all pages"                
+                                
         try:
             threshold = int(self.request.get('threshold'))
         except:
@@ -88,11 +98,6 @@ class MainHandler(Handler):
         except:
             days = 14
         
-        # TO ALSO GET
-        # A category to drill into (e.g., only Geophysics)
-        # New pages or all edited pages (could be slow)
-        # Whether to score various parameters?
-        
         if url:
             o = urlparse(url)
             domain = o.netloc
@@ -100,10 +105,10 @@ class MainHandler(Handler):
             print "AWESOME, the URL is {0}{1}".format(domain,path)
         else:
             domain, path = 'subsurfwiki.org','/mediawiki/'
-            print "SOMETHING WRONG, no URL"
+            print "No URL, using default"
             url = 'http://{0}{1}api.php'.format(domain, path)
 
-        result = patrol.newpages(domain=domain,path=path,threshold=threshold,days=days)
+        result = patrol.newpages(domain=domain,path=path,categories=cats,threshold=threshold,days=days)
         
         worst = result[0]
         bad = result[1]

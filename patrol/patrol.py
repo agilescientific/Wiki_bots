@@ -2,6 +2,7 @@
 
 import mwclient
 import re
+import time
 
 # Authenticate
 #import config
@@ -12,14 +13,14 @@ import re
 #WIKI_URL = config.config['wiki_url']
 #WIKI_PATH = config.config['wiki_path'] # The script path for your wiki
 
-def newpages(domain='subsurfwiki.org', path='/mediawiki/'):
+def newpages(domain, path, threshold=10, days=14):
     
     site = mwclient.Site(domain, path=path)
     print 'connecting to {0}'.format(domain)
     #site.login(BOT_NAME, PASSWORD)
     
     # Get the list of new pages' titles
-    new_pages = [new_page['title'] for new_page in site.recentchanges() if new_page['type'] == u'new' and new_page['ns'] == 0]
+    new_pages = [new_page['title'] for new_page in site.recentchanges() if new_page['type'] == u'new' and new_page['ns'] == 0  and (time.gmtime()[7] - new_page['timestamp'][7]) < days]
         
     # Build a dict of pages with their scores on various axes
     results = {}
@@ -31,8 +32,12 @@ def newpages(domain='subsurfwiki.org', path='/mediawiki/'):
             continue
     
         # Length: 0 bytes scores 0, 1000 bytes or more scores 5
-        results[p] = [min(int(page.length/200),5)]
-    
+        try:
+            results[p] = [min(int(page.length/200),5)]
+        except Exception, e:
+            print "Skipping page, probably deleted, ", p, e
+            continue
+           
         # Categories: 1 per cat, up to max of 3
         results[p].append(min(len([c for c in page.categories()]),3))
     
@@ -72,7 +77,7 @@ def newpages(domain='subsurfwiki.org', path='/mediawiki/'):
         else:
             new_pages[p].append(False)
         
-        if score >= 10:
+        if score >= threshold:
             good[p] = results[p]
             if score > best_score:
                 # best = p

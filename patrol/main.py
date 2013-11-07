@@ -73,10 +73,25 @@ class StaticHandler(Handler):
 # This is where the handlers go
 class MainHandler(Handler):
     def get(self):
-        self.render('patrol.html')
+        self.render('patrol_nojs.html')
         
     def post(self):
         url = self.request.get('url')
+        
+        try:
+            threshold = int(self.request.get('threshold'))
+        except:
+            threshold = 10
+            
+        try:
+            days = int(self.request.get('days'))
+        except:
+            days = 14
+        
+        # TO ALSO GET
+        # A category to drill into (e.g., only Geophysics)
+        # New pages or all edited pages (could be slow)
+        # Whether to score various parameters?
         
         if url:
             o = urlparse(url)
@@ -86,17 +101,19 @@ class MainHandler(Handler):
         else:
             domain, path = 'subsurfwiki.org','/mediawiki/'
             print "SOMETHING WRONG, no URL"
-        
-        result = patrol.newpages(domain,path)
+            url = 'http://{0}{1}api.php'.format(domain, path)
+
+        result = patrol.newpages(domain=domain,path=path,threshold=threshold,days=days)
         
         worst = result[0]
         bad = result[1]
         
         everything = result[2]
                         
+        # Build the URL to pass to the HTML page for making links
         page_url = re.sub(r'api.php',r'index.php',url)
         
-        self.render('patrol.html', worst=worst, bad=bad, url=url, page_url=page_url, results=everything)
+        self.render('patrol_nojs.html', worst=worst, bad=bad, url=url, page_url=page_url, results=everything, threshold=threshold)
 
 # The webapp itself...
 app = WSGIApplication([

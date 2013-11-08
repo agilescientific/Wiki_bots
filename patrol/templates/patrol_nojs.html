@@ -18,12 +18,12 @@
     
     <style>
       .chart div {
-      font: 10px sans-serif;
+      font: 11px sans-serif;
       background-color: #428bca;
       float: right;
       text-align: right;
-      padding: 3px;
-      margin: 1px;
+      padding: 3px 5px 3px 0px;
+      margin: 6px 0px 0px 0px;
       color: white;
       }
     </style>
@@ -134,10 +134,11 @@
                   </div>
                 </td>
 
-                <td  width="20%">
+                <td  width="17%">
                 <form display="inline">
-                  <button type="button" class="btn btn-success" onclick="location.href='{{ page_url }}?title={{ page | replace(' ','_') }}&action=edit'">Edit</button>
-                  <button type="button" class="btn btn-info" onclick="location.href='{{ page_url }}?title={{ page | replace(' ','_') }}&action=history'">History</button>
+                  <button type="button" class="btn btn-success btn-xs" onclick="location.href='{{ page_url }}?title={{ page | replace(' ','_') }}&action=edit'">Edit</button>
+                  <span width="20px">&nbsp;</span>
+                  <button type="button" class="btn btn-info btn-xs" onclick="location.href='{{ page_url }}?title={{ page | replace(' ','_') }}&action=history'">History</button>
                 </form>
                 </td>
 

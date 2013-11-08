@@ -134,9 +134,11 @@
                   </div>
                 </td>
 
-                <td  width="17%">
+                <td  width="25%">
                 <form display="inline">
                   <button type="button" class="btn btn-success btn-xs" onclick="location.href='{{ page_url }}?title={{ page | replace(' ','_') }}&action=edit'">Edit</button>
+                  <span width="20px">&nbsp;</span>
+                  <button type="button" class="btn btn-warning btn-xs" onclick="location.href='/tag/{{ page | replace(' ','_') }}'">Tag</button>
                   <span width="20px">&nbsp;</span>
                   <button type="button" class="btn btn-info btn-xs" onclick="location.href='{{ page_url }}?title={{ page | replace(' ','_') }}&action=history'">History</button>
                 </form>

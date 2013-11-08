@@ -10,16 +10,6 @@
 ############################
 # Import libraries
 
-# One approach to static files: DirectoryApp
-#from paste.fileapp import DirectoryApp
-
-# Another approach: Cascade
-#from paste.urlparser import StaticURLParser
-#from paste.cascade import Cascade
-
-# Yet another approach
-#from webapp2_static import StaticFileHandler
-
 # Main handlers and server
 from webapp2 import RequestHandler, WSGIApplication
 from paste import httpserver
@@ -30,8 +20,23 @@ import os
 import re
 from urlparse import urlparse
 
-# Import the file with the wiki client and processor in it
+# Import the wiki processing stuff
+import mwclient
 import patrol
+
+# Import the config with the wiki settings
+from config import config
+
+#######
+# This is gross, but I can't see how else to instantiate the site variable
+site = None
+
+############################
+# Set up the authentication
+BOT_USERNAME = config['username']
+BOT_PASSWORD = config['password']
+DEFAULT_WIKI = config['defaultwiki']
+DEFAULT_PATH = config['defaultpath']
 
 #############################
 # Set up the template stuff
@@ -55,6 +60,8 @@ class Handler(RequestHandler):
     def render(self, template, **kw):
         self.write(self.render_str(template, **kw))
 
+#############################
+# Deal with static resources like CSS, JS, etc.
 class StaticHandler(Handler):
     def get(self, path):
         abs_path = os.path.abspath(os.path.join(os.path.dirname(__file__),'static', path))
@@ -84,9 +91,9 @@ class MainHandler(Handler):
         cats = filter(None,cats)
         
         if cats:
-            print "working on categories", cats
+            print "-- Categories provided; working on categories", cats
         else:
-            print "working on all pages"                
+            print "-- No categories; working on all pages"                
                                 
         try:
             threshold = int(self.request.get('threshold'))
@@ -102,27 +109,52 @@ class MainHandler(Handler):
             o = urlparse(url)
             domain = o.netloc
             path = re.sub(r'api.php',r'',o.path)
-            print "AWESOME, the URL is {0}{1}".format(domain,path)
+            print "-- AWESOME, the URL is {0}".format(url)
         else:
-            domain, path = 'subsurfwiki.org','/mediawiki/'
-            print "No URL, using default"
+            domain, path = DEFAULT_WIKI,DEFAULT_PATH
             url = 'http://{0}{1}api.php'.format(domain, path)
+            print "-- No URL provided, using {0}".format(url)
 
-        result = patrol.newpages(domain=domain,path=path,categories=cats,threshold=threshold,days=days)
+        # Authenticate in the wiki
+        global site
         
-        worst = result[0]
-        bad = result[1]
+        try:
+            site = mwclient.Site(domain, path=path)
+            print '-- Connected to API at {0}'.format(domain)
+            
+            result = patrol.newpages(site=site,categories=cats,threshold=threshold,days=days)
         
-        everything = result[2]
-                        
-        # Build the URL to pass to the HTML page for making links
-        page_url = re.sub(r'api.php',r'index.php',url)
-        
-        self.render('patrol_nojs.html', worst=worst, bad=bad, url=url, page_url=page_url, results=everything, threshold=threshold)
+            worst = result[0]
+            bad = result[1]
+            
+            everything = result[2]
+                            
+            # Build the URL to pass to the HTML page for making links
+            page_url = re.sub(r'api.php',r'index.php',url)
+            
+            self.render('patrol_nojs.html', worst=worst, bad=bad, url=url, page_url=page_url, results=everything, threshold=threshold)
+
+        except Exception, e:
+            print '** Failed to connect to {0}'.format(domain)
+            self.response.out.write("Something went wrong: {0}".format(e))
+
+class TagHandler(Handler):
+    def get(self, page):
+
+        print "-- Request to tag article '{0}'; using bot user {1}".format(page, BOT_USERNAME)
+
+        global site
+        site.login(BOT_USERNAME, BOT_PASSWORD)
+
+        patrol.tag_page(site, page)
+
+        self.redirect("/")
+        #self.response.out.write("Holy shit it works!")
 
 # The webapp itself...
 app = WSGIApplication([
     ('/', MainHandler),
+    (r'/tag/(.+)', TagHandler),
     (r'/patrol/static/(.+)', StaticHandler)
 ], debug = True)
 

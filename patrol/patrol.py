@@ -4,26 +4,61 @@ import mwclient
 import re
 import time
 
-# Authenticate
-#import config
+def tag_page(site, page):
 
-#BOT_NAME = 'exbot'
-#PASSWORD = config.config[BOT_NAME]
-
-#WIKI_URL = config.config['wiki_url']
-#WIKI_PATH = config.config['wiki_path'] # The script path for your wiki
-
-def newpages(domain, path, categories=None, threshold=10, days=14):
+    # Keep track of attempts
+    tries = 0
     
-    site = mwclient.Site(domain, path=path)
-    print 'connecting to {0}'.format(domain)
-    #site.login(BOT_NAME, PASSWORD)
+    # Do this in a while loop to retry if there's an edit conflict
+    while True:
+        
+        tries += 1
+        
+        page = site.Pages[page]
+        
+        # Grab the text on the page
+        text = page.edit()
+        
+        # Add something to the end of every page, if it's not there already
+        if '{{quality}}' not in text:
+            text = '{{quality}}\n' + text
+            print '-- Tagged {0}'.format(page.page_title)
+        else:
+            print '** {0} is already tagged; skipped'.format(page.page_title)
+        
+        # Save the page back to the wiki
+        try:
+            page.save(text,"Tagged on Patrol") # Really need a username here
+            print '-- Saved {0}'.format(page.page_title)
+
+        except mwclient.EditError:
+            if tries == 5:
+                print "** Giving up after {0} tries".format('5')
+            else:
+                print "** Failed to save {0}: trying again".format(page.page_title)
+                time.sleep(2)
+                continue
+
+        except mwclient.HTTPRedirectError:
+            print "-- Failed to save {0}: redirect error".format(page.page_title)
+            
+        except mwclient.ProtectedPageError:
+            print "-- Failed to save {0}: page is protected".format(page.page_title)
+
+        break
+    
+def newpages(site, categories=None, threshold=10, days=14):
     
     # Get the list of new pages' titles
-    new_pages = [new_page['title'] for new_page in site.recentchanges() if new_page['type'] == u'new' and new_page['ns'] == 0  and (time.gmtime()[7] - new_page['timestamp'][7]) < days]
-    
-    
-    
+    # Using a rather long list comprehension
+    new_pages = [new_page['title']
+                 for new_page
+                 in site.recentchanges()
+                 if new_page['type'] == u'new'
+                 and new_page['ns'] == 0
+                 and (time.gmtime()[7] - new_page['timestamp'][7]) < days
+                 ]
+       
     # Build a dict of pages with their scores on various axes
     results = {}
     for p in new_pages:

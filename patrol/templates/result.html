@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block content %}    
+<div class="container"> <!-- start container -->
+
+<div class="jumbotron">
+  <h3>Worst page{% if worst.__len__() > 1 %}s{% endif %}<br />
+	  <small style="color:lightgray; line-height=67%;">{{ url }}</small></h3>
+	  
+  <table width="100%">
+  
+	{% for page in worst %}
+	
+	  {% set slug =  page | replace(' ','_') %}
+	  {% set score = results[page][0] %}
+	
+	  <tr>
+		<td style="width:15%">
+		  <div class="chart" style="padding:0 1em 0 0;">
+			<div style="width: {{ 100 - results[page][0] * ( 100 / threshold ) }}px;">{{ 10 - results[page][0] * ( 10 / threshold ) | int }}</div>
+		  </div>
+		</td>
+
+		<td  width="25%">
+		<form display="inline">
+		  <button type="button" class="btn btn-info btn-xs" onclick="location.href='{{ page_url }}?title={{ slug }}&action=history'">
+			History
+		  </button>
+		  <span width="20px">&nbsp;</span>
+		  <button type="button" class="btn btn-success btn-xs" onclick="location.href='{{ page_url }}?title={{ slug }}&action=edit'">
+			Edit
+		  </button>
+		  <span width="20px">&nbsp;</span>
+		  <button type="button" id="{{ slug }}" data-loading-text="Tagging..." class="btn btn-warning btn-xs"><!-- use tag URL: onclick="location.href='/tag/{{ slug }}'" -->
+			Tag
+			<script>
+              $( "#{{ slug }}" ).click(function () {
+	            var btn = $(this)
+	            btn.button('loading');
+					
+	            $.ajax({
+                  url: "/patrol/scripts/test.py",
+	              type: "post",
+                  datatype: "json",
+                  data: {'key':'value','key2':'value2' },
+                  success : function(response) {
+                    alert(response.message);
+                    alert(response.keys);
+	              }
+	            });
+              })
+            </script>
+		  </button>
+		</form>
+		</td>
+
+		<td>
+		  <a href="{{ page_url }}?title={{ slug }}">{{ page }}</a>
+		</td>
+	  </tr>
+	  
+	{% endfor %}
+	
+  </table>
+  
+</div> <!-- end jumbotron -->
+
+{% if bad %}
+<div class="jumbotron">
+  <h3>Page{% if bad.__len__() > 1 %}s{% endif %} with possibly bad title{% if bad.__len__() > 1 %}s{% endif %}</h3>
+  <p>
+	{% for page in bad %}
+	  <li><a href="{{ page_url }}?title={{page|replace(" ","_")}}">{{ page }}</a></li>
+	{% endfor %}
+  </p>
+</div> <!-- end jumbotron -->
+{% endif %}
+
+</div> <!-- end container -->
+
+{% endblock %}

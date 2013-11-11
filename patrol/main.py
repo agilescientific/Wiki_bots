@@ -63,8 +63,8 @@ class Handler(RequestHandler):
 #############################
 # Deal with static resources like CSS, JS, etc.
 class StaticHandler(Handler):
-    def get(self, path):
-        abs_path = os.path.abspath(os.path.join(os.path.dirname(__file__),'static', path))
+    def get(self, file):
+        abs_path = os.path.abspath(os.path.join(os.path.dirname(__file__),'static', file))
         if os.path.isdir(abs_path) or abs_path.find(os.getcwd()) != 0:
             self.response.set_status(403)
             return
@@ -80,7 +80,12 @@ class StaticHandler(Handler):
 # This is where the handlers go
 class MainHandler(Handler):
     def get(self):
-        self.render('patrol_nojs.html')
+        self.render('patrol.html')
+        
+class ResultHandler(Handler):
+    def get(self):
+        self.redirect('/') # goes back to start
+        # return OR pass   # goes to tag page
         
     def post(self):
         url = self.request.get('url')
@@ -122,22 +127,21 @@ class MainHandler(Handler):
             site = mwclient.Site(domain, path=path)
             print '-- Connected to API at {0}'.format(domain)
             
-            result = patrol.newpages(site=site,categories=cats,threshold=threshold,days=days)
-        
-            worst = result[0]
-            bad = result[1]
-            
-            everything = result[2]
-                            
-            # Build the URL to pass to the HTML page for making links
-            page_url = re.sub(r'api.php',r'index.php',url)
-            
-            self.render('patrol_nojs.html', worst=worst, bad=bad, url=url, page_url=page_url, results=everything, threshold=threshold)
-
         except Exception, e:
-            print '** Failed to connect to {0}'.format(domain)
-            self.response.out.write("Something went wrong: {0}".format(e))
+            print '** Failed to connect to {0}: {1}'.format(domain,e)
 
+        result = patrol.newpages(site=site,categories=cats,threshold=threshold,days=days)
+    
+        worst = result[0]
+        bad = result[1]
+        
+        everything = result[2]
+                        
+        # Build the URL to pass to the HTML page for making links
+        page_url = re.sub(r'api.php',r'index.php',url)
+        
+        self.render('result.html', worst=worst, bad=bad, url=url, page_url=page_url, results=everything, threshold=threshold)
+        
 class TagHandler(Handler):
     def get(self, page):
 
@@ -148,12 +152,13 @@ class TagHandler(Handler):
 
         patrol.tag_page(site, page)
 
-        self.redirect("/")
-        #self.response.out.write("Holy shit it works!")
+        return
 
 # The webapp itself...
 app = WSGIApplication([
     ('/', MainHandler),
+    (r'/result', ResultHandler),
+#    (r'/scripts/.+',TagHandler),
     (r'/tag/(.+)', TagHandler),
     (r'/patrol/static/(.+)', StaticHandler)
 ], debug = True)

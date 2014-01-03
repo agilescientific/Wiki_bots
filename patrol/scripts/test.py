@@ -2,11 +2,31 @@
 
 import cgi, cgitb
 
-cgitb.enable()   # traceback handler, for debugging
+def main():
 
-fs = cgi.FieldStorage()
+    cgitb.enable()   # traceback handler, for debugging
 
-jquery_input = fs.getvalue('data')
+    fs = cgi.FieldStorage()
 
-print "Content-type: text/html"
-print jquery_input
+    jquery_input = fs.getvalue('input')
+
+    print jquery_input
+    
+    do_it(jquery_input)
+    
+    out = open('tmp.txt','w')
+    out.write(jquery_input)
+    out.close()
+
+    return
+        
+def do_it(whatever):
+    
+    print "Content-Type: text/html\n" 
+    print "do_it() ran!\n"
+    print whatever
+    
+    return
+
+if __name__ == "__main__":
+    main()

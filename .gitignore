@@ -17,6 +17,7 @@ cop*
 
 # Output files #
 ################
+*.csv
 *.out
 *.dl
 *.txt

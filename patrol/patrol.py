@@ -64,21 +64,26 @@ def newpages(site, categories=None, threshold=10, days=14):
     results = {}
     for p in new_pages:
     
-        print "-- Rating {0}".format(p)
+        print "-- Evaluating {0}".format(p)
         
         page = site.Pages[p]
     
         # Skip redirects and subpages
         if page.redirect or ('/' in p):
             continue
-    
+
+        if categories:
+            if p not in [c.page_title for c in page.categories()]:
+                print "** Skipping page not in category list,", p.encode('utf-8')
+                continue
+
         # Length: 0 bytes scores 0, 1000 bytes or more scores 5
         try:
             results[p] = [min(int(page.length/200),5)]
             print " - Scored {0} on Length".format(results[p][-1])
 
         except Exception, e:
-            print "** Skipping page, probably deleted, ", p, e
+            print "** Skipping page, probably deleted,", p.encode('utf-8'), e
             continue
            
         # Categories: 1 per cat, up to max of 3

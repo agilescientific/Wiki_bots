@@ -8,7 +8,7 @@
     <meta name="author" content="">
     
     <!-- Le styles -->
-    <link href="/patrol/static/css/bootstrap.css" rel="stylesheet">
+    <link href="/patrol/assets/css/bootstrap.css" rel="stylesheet">
     <style type="text/css">
       body {
         padding-top: 60px;
@@ -17,28 +17,32 @@
     </style>
     
     <style>
+      .table tbody>tr>td.vert-align
+      {
+        vertical-align: middle;
+      }
+    </style>
+    
+    <style>
       .chart div {
-      font: 11px sans-serif;
+      font: 12px sans-serif;
       background-color: #428bca;
       float: right;
       text-align: right;
       padding: 3px 5px 3px 0px;
-      margin: 6px 0px 0px 0px;
+      margin: 7px 0px 0px 0px;
       color: white;
       }
     </style>
     
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
-    
-    <script src="/patrol/static/js/bootstrap.js"></script>
-    <script src="/patrol/static/js/button.js"></script>
 
     <script>  
       $(document).ready(function() {
       $('.dropdown-toggle').dropdown();
       });
     </script>
-
+    
   </head>
 
   <body>
@@ -80,7 +84,9 @@
     <!-- Le javascript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
-    <script src="/patrol/static/js/bootstrap-dropdown.js"></script>
+    <script src="/patrol/assets/js/bootstrap-dropdown.js"></script>
+    <script src="/patrol/assets/js/bootstrap.js"></script>
+    <script src="/patrol/assets/js/button.js"></script>
 
   </body>
 </html>

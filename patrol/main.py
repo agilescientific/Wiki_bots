@@ -64,7 +64,7 @@ class Handler(RequestHandler):
 # Deal with static resources like CSS, JS, etc.
 class StaticHandler(Handler):
     def get(self, file):
-        abs_path = os.path.abspath(os.path.join(os.path.dirname(__file__),'static', file))
+        abs_path = os.path.abspath(os.path.join(os.path.dirname(__file__),'assets', file))
         if os.path.isdir(abs_path) or abs_path.find(os.getcwd()) != 0:
             self.response.set_status(403)
             return
@@ -84,15 +84,15 @@ class MainHandler(Handler):
         
 class ResultHandler(Handler):
     def get(self):
-        self.redirect('/') # goes back to start
-        # return OR pass   # goes to tag page
+        #self.redirect('/') # goes back to start
+        pass   # goes to tag page
         
     def post(self):
         url = self.request.get('url')
         categories = self.request.get('categories')        
         categories = re.sub(r"[,\.\n]+", r"\n", categories)
         
-        cats = [i.strip() for i in categories.split('\n')]
+        cats = [c.strip().title() for c in categories.split('\n')]
         cats = filter(None,cats)
         
         if cats:
@@ -152,15 +152,16 @@ class TagHandler(Handler):
 
         patrol.tag_page(site, page)
 
-        return
+        #return
 
 # The webapp itself...
 app = WSGIApplication([
     ('/', MainHandler),
+    (r'/result#(.+)', TagHandler),
     (r'/result', ResultHandler),
 #    (r'/scripts/.+',TagHandler),
-    (r'/tag/(.+)', TagHandler),
-    (r'/patrol/static/(.+)', StaticHandler)
+    (r'/patrol/assets/(.+)', StaticHandler),
+    (r'/patrol/scripts/(.+)\?.+', StaticHandler)
 ], debug = True)
 
 def main():

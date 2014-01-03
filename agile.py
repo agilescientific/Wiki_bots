@@ -11,7 +11,7 @@ def sentence(string):
     
     # Allow some exceptions
     # NB We also allow all uppercase-only words, see all-caps heuristic
-    DO_NOT_CONVERT = ['SEM', 'CL', 'AVO', 'XF', 'XRF', 'XRD', 'AAPG', 'SPE']
+    DO_NOT_CONVERT = ['SEM', 'CL', 'AVO', 'XF', 'XRF', 'XRD', 'AAPG', 'SPE', 'Campos']
     
     for key, value in states.iteritems():
         DO_NOT_CONVERT.append(value)

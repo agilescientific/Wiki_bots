@@ -2,29 +2,44 @@
 # Linknet
 
 import mwclient
-import re
 from passwords import passwords
-import urllib, urllib2
+import urllib2, urlparse
 from cookielib import CookieJar
 
 USER = passwords['seg']['user']
 PASS = passwords['seg']['pass']
 
-# First, set up the login parameters
+# First, get the URL token for logging in
+response = urllib2.urlopen('http://wiki.seg.org/wiki/Special:UserLogin')
+token = urlparse.urlparse(response.geturl()).query
+
+# Now set up the login URL, headers etc.
 LOGIN_URL = "https://login.seg.org/LoginTemplates/SEGDefaultLogin.aspx"
 HEADERS = {'HTTP_USER_AGENT': 'SEG Wiki user matthall', 'HTTP_ACCEPT':'text/html,application/xhtml+xml,application/xml; q=0.9,*/*; q=0.8','Content-Type': 'application/x-www-form-urlencoded'}
-encoded_fields = "__LASTFOCUS=&__EVENTTARGET=&__EVENTARGUMENT=&__VIEWSTATE=&__EVENTVALIDATION=&LoginTextBox={0}&PasswordTextBox={1}&SubmitButton=Go".format(USER,PASS)
+DATA = "{0}&__LASTFOCUS=&__EVENTTARGET=&__EVENTARGUMENT=&__VIEWSTATE=&__EVENTVALIDATION=&LoginTextBox={1}&PasswordTextBox={2}&SubmitButton=Go".format(token,USER,PASS)
 cj = CookieJar()
 opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
 
 # Now let's authenticate on seg.org
-request = urllib2.Request(LOGIN_URL,encoded_fields,HEADERS)
+request = urllib2.Request(LOGIN_URL, DATA, HEADERS)
 response = opener.open(request)
-result = response.read()
-if "bangreeting" in result:
-    print "Login successful"
+
+######### PROBLEM ###########
+# I don't understand the response...
+print response.read()
+#############################
+
+if ("bangreeting" or "Special:UserLogout") in response.read():
+    print "SEG.org login successful"
 else:
-    print "Login failed"
+    print "SEG.org login failed"
+
+# Check if we're authneticated in the wiki
+response = urllib2.urlopen('http://wiki.seg.org/wiki/Main_Page')
+if ("Special:UserLogout") in response.read():
+    print "Wiki login successful"
+else:
+    print "Wiki login failed"
 
 # Now we can start a wiki session
 WIKI_URL = 'wiki.seg.org'
@@ -37,7 +52,7 @@ c = {}
 for cookie in cj:
     c[cookie.name] = cookie.value
 
-site.login(username=USER,password=PASS,cookies=c)
+#site.login(cookies=c)
 
 ##### GET ON WITH IT #####
 # Use site.allpages, defaults to main namespace
@@ -47,7 +62,7 @@ count = 0
 
 for page in site.allpages(namespace=500,minsize=10,filterredir='nonredirects'):
 
-    # Sometimes need to filter or act based on page contents
+    # Just process two for testing
     if count > 2:
         break
     

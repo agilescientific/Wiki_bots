@@ -6,6 +6,7 @@ config.py
 # proprietary stuff #
 #####################
 cop*
+aapg*
 
 # Notebooks #
 #############

@@ -4,6 +4,7 @@
 <div class="container"> <!-- start container -->
 
 <div class="jumbotron">
+
   {% if worst.__len__() == 0 %}
   <h3>No pages found<br />
 	  <small style="color:lightgray; line-height=67%;">{{ url }}</small></h3>
@@ -11,12 +12,18 @@
 	  
   {% if worst.__len__() == 1 %}
   <h3>Worst page<br />
-	  <small style="color:lightgray; line-height=67%;">{{ url }}</small></h3>
+	  <small style="color:lightgray; line-height=67%;">
+	    Checked <strong>{{ results.__len__() }}</strong> new pages at <strong>{{ url }}</strong> in <strong>{{ time }}</strong> seconds
+	  </small>
+  </h3>
   {% endif %}
 	  
   {% if worst.__len__() > 1 %}
   <h3>Worst pages<br />
-	  <small style="color:lightgray; line-height=67%;">{{ url }}</small></h3>
+	  <small style="color:lightgray; line-height=67%;">
+	    Checked <strong>{{ results.__len__() }}</strong> new pages at <strong>{{ url }}</strong> in <strong>{{ time }}</strong> seconds
+	  </small>
+  </h3>
   {% endif %}
 	  
   <table class="table" width="100%">
@@ -34,32 +41,17 @@
 		</td>
 
 		<td class="vert-align" width="25%">
-		<form display="inline">
-		  <button type="button" class="btn btn-info btn-xs" onclick="location.href='{{ page_url }}?title={{ slug }}&action=history'">
+		<form display="inline" method="POST">
+		  <button type="submit" class="btn btn-info btn-xs" formaction='{{ page_url }}?title={{ slug }}&action=history'">
 			History
 		  </button>
 		  <span width="20px">&nbsp;</span>
-		  <button type="button" class="btn btn-success btn-xs" onclick="location.href='{{ page_url }}?title={{ slug }}&action=edit'">
+		  <button type="submit" class="btn btn-success btn-xs" formaction='{{ page_url }}?title={{ slug }}&action=edit'">
 			Edit
 		  </button>
 		  <span width="20px">&nbsp;</span>
-		  <button type="button" id="{{ slug }}" data-loading-text="Tagging..." class="btn btn-warning btn-xs" ><!-- use tag URL: onclick="location.href='/tag/{{ slug }}'" -->
+		  <button type="button" id="{{ slug }}" data-loading-text="Tagging..." class="btn btn-warning btn-xs" onclick="">
 			Tag
-			<script>
-              $("#{{ slug }}").click(function(){
-              
-	            var btn = $(this);
-	            btn.button('loading');
-	            
-	            alert("I'm going to start processing");
-					
-	            taggart("{{ slug }}");
-	            
-	            btn.button('reset');
-	            alert("I think I'm done");
-	            
-              })
-            </script>
 		  </button>
 		</form>
 		</td>
@@ -78,14 +70,40 @@
 {% if bad %}
 <div class="jumbotron">
   <h3>Page{% if bad.__len__() > 1 %}s{% endif %} with possibly bad title{% if bad.__len__() > 1 %}s{% endif %}</h3>
-  <p>
+  <ul style="list-style-type: none;">
 	{% for page in bad %}
 	  <li><a href="{{ page_url }}?title={{page|replace(" ","_")}}">{{ page }}</a></li>
 	{% endfor %}
-  </p>
+  </ul>
 </div> <!-- end jumbotron -->
 {% endif %}
 
 </div> <!-- end container -->
+
+<script type="text/javascript">
+  $("#{{ slug }}").click(function(){
+  
+	var btn = $(this);
+	btn.button('loading');
+	
+	alert("I'm going to start processing");
+		
+    $.ajax({
+    type: "POST",
+    url: "/tag",
+    dataType: 'json',
+    data: {page: '{{ slug }}' },
+    async: asynchronous,
+    success: function(response){
+      alert("Success");
+      }
+    });
+    	
+	btn.button('reset');
+	alert("I think I'm done");
+	
+  })
+</script>
+
 
 {% endblock %}

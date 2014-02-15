@@ -34,7 +34,7 @@ if ("bangreeting" or "Special:UserLogout") in response.read():
 else:
     print "SEG.org login failed"
 
-# Check if we're authneticated in the wiki
+# Check if we're authenticated in the wiki
 response = urllib2.urlopen('http://wiki.seg.org/wiki/Main_Page')
 if ("Special:UserLogout") in response.read():
     print "Wiki login successful"
@@ -52,7 +52,7 @@ c = {}
 for cookie in cj:
     c[cookie.name] = cookie.value
 
-#site.login(cookies=c)
+site.login(cookies=c)
 
 ##### GET ON WITH IT #####
 # Use site.allpages, defaults to main namespace

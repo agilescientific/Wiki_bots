@@ -19,6 +19,8 @@ import jinja2
 import os
 import re
 from urlparse import urlparse
+import time
+TIME = {}
 
 # Import the wiki processing stuff
 import mwclient
@@ -82,12 +84,10 @@ class MainHandler(Handler):
     def get(self):
         self.render('patrol.html')
         
-class ResultHandler(Handler):
-    def get(self):
-        #self.redirect('/') # goes back to start
-        pass   # goes to tag page
-        
     def post(self):
+    
+        TIME['start'] = time.time()
+            
         url = self.request.get('url')
         categories = self.request.get('categories')        
         categories = re.sub(r"[,\.\n]+", r"\n", categories)
@@ -140,10 +140,15 @@ class ResultHandler(Handler):
         # Build the URL to pass to the HTML page for making links
         page_url = re.sub(r'api.php',r'index.php',url)
         
-        self.render('result.html', worst=worst, bad=bad, url=url, page_url=page_url, results=everything, threshold=threshold)
+        query_time = str(round(time.time() - TIME['start'],1))
+
+        self.render('result.html', worst=worst, bad=bad, url=domain, page_url=page_url, results=everything, threshold=threshold, time=query_time)
         
 class TagHandler(Handler):
-    def get(self, page):
+        
+    def post(self):
+    
+        page = self.request.get('page')
 
         print "-- Request to tag article '{0}'; using bot user {1}".format(page, BOT_USERNAME)
 
@@ -152,16 +157,18 @@ class TagHandler(Handler):
 
         patrol.tag_page(site, page)
 
-        #return
-
+        self.response.write('<html><body>')
+        self.response.write('Tagged and got to end of handler.')
+        self.response.write('</body></html>')
+        # self.redirect('/result')
+        
 # The webapp itself...
 app = WSGIApplication([
     ('/', MainHandler),
-    (r'/result#(.+)', TagHandler),
-    (r'/result', ResultHandler),
-#    (r'/scripts/.+',TagHandler),
+    (r'/result', MainHandler),
+#     (r'/result#<page:(.+)>', TagHandler),
+     (r'/tag', TagHandler),
     (r'/patrol/assets/(.+)', StaticHandler),
-    (r'/patrol/scripts/(.+)\?.+', StaticHandler)
 ], debug = True)
 
 def main():

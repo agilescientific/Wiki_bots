@@ -1,7 +1,7 @@
 # Secret info #
 ###############
-password*.py
-config.py
+password*
+config*
 
 # proprietary stuff #
 #####################

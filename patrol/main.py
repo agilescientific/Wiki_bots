@@ -157,9 +157,7 @@ class TagHandler(Handler):
 
         patrol.tag_page(site, page)
 
-        self.response.write('<html><body>')
-        self.response.write('Tagged and got to end of handler.')
-        self.response.write('</body></html>')
+        self.response.write('Done')
         # self.redirect('/result')
         
 # The webapp itself...

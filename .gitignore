@@ -3,6 +3,9 @@
 password*
 config*
 
+# Libraries #
+wikitools
+
 # proprietary stuff #
 #####################
 cop*

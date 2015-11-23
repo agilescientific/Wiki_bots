@@ -35,3 +35,8 @@ aapg*
 Icon?
 Thumbs.db
 
+# Emacs Files #
+###############
+.#.*
+\#*#
+*~

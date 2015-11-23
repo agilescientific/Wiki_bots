@@ -21,7 +21,9 @@
 #
 # UPDATES
 # Jun 2014 - switched mwclient for wikitools to cope with HTTPS - Matt
-# November 2014 - Moved 
+# November 2014 - Moved password to yaml file - Mark
+# November 2015 - Tidied up code re: linting - Mark
+#               - Added -q option
 #
 
 # Import libraries
@@ -30,11 +32,17 @@ from utils import config, setup
 import urllib2
 import time
 import json
+import argparse
+
+
+def maybe_print(str):
+    if not config.setting['quiet']:
+        print str,
 
 
 def bot_status(site):
     # Check the bot's status page
-    print "Checking script permission to run...",
+    maybe_print("Checking script permission to run...")
     try:
         p = page.Page(site, config.setting['pricebot']['status_page'])
         status = p.getWikiText()
@@ -44,8 +52,8 @@ def bot_status(site):
                 print "Bot stopped by Status page"
                 return 0
     except page.NoPage:
-        print "Status page doesn't exist... continuing"
-    print "The script has permission to run"
+        maybe_print("Status page doesn't exist... continuing\n")
+    maybe_print("The script has permission to run\n")
     return 1
 
     # Could also block the bot's user with a button on the bot's page
@@ -89,19 +97,19 @@ def set_exchange_rates(site):
                 text = rate + update_time
                 r = p.edit(text=text,
                            summary='Regular update from Yahoo Finance', bot=1)
-                print currency, "=", rate,
+                maybe_print(currency + " = " + rate)
 
                 if r['edit']['result'] == 'Success':
-                    print '-- Saved'
+                    maybe_print("-- Saved\n")
                 else:
-                    print '** Save failed'
+                    print '** Save failed for ' + currency
 
             else:
                 print currency, 'rate not retrieved, page not saved'
 
         else:
             # Timed out
-            print currency, "failed"
+            print currency, "timed out"
             pass
 
     return None
@@ -175,32 +183,38 @@ def set_crude_prices(site):
                 text = price + update_time
                 r = p.edit(text=text,
                            summary='Regular update from Yahoo Finance', bot=1)
-                print benchmark, "=", price,
 
                 if r['edit']['result'] == 'Success':
-                    print '-- Saved'
+                    maybe_print(benchmark + ' = ' + price + "-- Saved\n")
                 else:
-                    print '** Save failed'
+                    print benchmark, "=", price, '** Save failed'
             else:
                 print benchmark, 'price not retrieved, page not saved'
 
         else:
             # Timed out
-            print benchmark, "failed"
+            print benchmark, "timed out"
             pass
 
     return None
 
-config = config(conffile="/onewiki/bots/config.yaml")
 
-# Now do the work!
-url = config.setting['pricebot']['wiki_url']
-httpuser = config.setting['pricebot']['username']
-httppass = config.setting['pricebot']['password']
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description="Pricebot -- update wiki page")
+    parser.add_argument('-q', '--quiet', action='store_true',
+                        default=False, help='Quiet non-error output')
+    args = parser.parse_args()
 
-site = setup(url, httpuser, httppass)
+    config = config(quiet=args.quiet)
 
-# Then check if the bot is disabled, and act accordingly
-if bot_status(site) == 1:
-    set_exchange_rates(site)
-    set_crude_prices(site)
+    # Now do the work!
+    url = config.setting['pricebot']['wiki_url']
+    httpuser = config.setting['pricebot']['username']
+    httppass = config.setting['pricebot']['password']
+
+    site = setup(url, httpuser, httppass, config)
+
+    # Then check if the bot is disabled, and act accordingly
+    if bot_status(site) == 1:
+        set_exchange_rates(site)
+        set_crude_prices(site)

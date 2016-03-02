@@ -74,6 +74,7 @@ def set_exchange_rates(site):
             config.setting['pricebot']['formats']
 
         errors = 0
+        result = dict()
         while errors < 4:
             try:
                 text = urllib2.urlopen(url).read()
@@ -84,7 +85,7 @@ def set_exchange_rates(site):
                 time.sleep(config.setting['pricebot']['retry_time'])
                 pass
 
-        if result['query']['count'] > 0:
+        if ( ( 'query' in result ) and result['query']['count'] > 0):
             # Extract the prices from the XML
             rate = result['query']['results']['rate']['Rate']
 
@@ -185,7 +186,7 @@ def set_crude_prices(site):
                            summary='Regular update from Yahoo Finance', bot=1)
 
                 if r['edit']['result'] == 'Success':
-                    maybe_print(benchmark + ' = ' + price + "-- Saved\n")
+                    maybe_print(benchmark + ' = ' + price + " -- Saved\n")
                 else:
                     print benchmark, "=", price, '** Save failed'
             else:

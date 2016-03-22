@@ -143,8 +143,9 @@ def set_crude_prices(site):
             "%20where%20symbol=%22{0}%22".format(symbol)
         url = config.setting['pricebot']['base_url'] + query + \
             config.setting['pricebot']['formats']
-
         errors = 0
+        result = { 'query': { 'count': 0 } }
+
         while errors < 4:
             try:
                 text = urllib2.urlopen(url).read()
